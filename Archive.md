@@ -8,5 +8,5 @@
 
 - ### Team Meeting Notes
     - [Related Work](https://docs.google.com/document/d/1oRROGzJVxJc9uPgyL7vtG7SIbwPAK5BfXIFJemqvbVU/edit)
-    - [Plan Prototyp](https://docs.google.com/document/d/1igEBwYDfVLu-44iM9WOsS8_yWdH6nScIo7KkKShGm1M/edit)
+    - [Plan Prototype](https://docs.google.com/document/d/1igEBwYDfVLu-44iM9WOsS8_yWdH6nScIo7KkKShGm1M/edit)
     - [Data Set](https://docs.google.com/presentation/d/1Jy2k7K6ZvleKewCKeFi-72J9qMUwvdgzyDxRChDNIUg/edit#slide=id.p)
