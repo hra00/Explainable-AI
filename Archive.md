@@ -1,6 +1,6 @@
 # Explainable-AI
 
-- ### [Google Drive](https://gitlab.lrz.de/mobile-ifi/qcp/21ws/continuous-optimization/bayer.git)
+- ### [Google Drive](https://drive.google.com/drive/folders/1owHlK2JytI5jbNsWRgwkqv0yOnLrlS_b?usp=sharing)
 
 - ### Slides for Presentation
   - 01 [Motivation](https://docs.google.com/presentation/d/1j6aZtxZPcLecY2w24a9uJT9KN4UYBX0XHhinqrqqeic/edit#slide=id.g101e131149a_0_0)
