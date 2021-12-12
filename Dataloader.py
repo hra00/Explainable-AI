@@ -52,7 +52,8 @@ def load_RAF(folderpath, target_img_size=(100, 100, 3)):
 	test_set = pd.DataFrame(data=test_set)
 
 	train_data_gen = ImageDataGenerator(rotation_range=10, width_shift_range=0.1, 
-	                                    height_shift_range=0.1, shear_range=0.1, zoom_range=0.1,)
+	                                    height_shift_range=0.1, shear_range=0.1, zoom_range=0.1,
+	                                    horizontal_flip=True)
 
 	test_data_gen = ImageDataGenerator()
 
@@ -148,7 +149,8 @@ def load_FERplus(folderpath, target_img_size=(100, 100, 3)):
 	# create generators
 	# TRAINING
 	train_data_gen = ImageDataGenerator(rotation_range=10, width_shift_range=0.1, 
-	                                    height_shift_range=0.1, shear_range=0.1, zoom_range=0.1)
+	                                    height_shift_range=0.1, shear_range=0.1, zoom_range=0.1,
+	                                    horizontal_flip=True)
 	train_data = train_data_gen.flow_from_dataframe(train_set, directory=train_dir, batch_size=32, 
 	                                                color_mode='rgb', shuffle=True, class_mode='categorical',
 	                                                target_img_size=target_img_size[:2])
