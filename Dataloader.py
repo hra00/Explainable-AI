@@ -2,6 +2,52 @@ import pandas as pd
 import numpy as np
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
+""" Load binary Dataset """
+def load_binary(folderpath, target_img_size=(100, 100, 3)):
+	"""
+	@params		folderpath, target_img_size
+	@returns	train_data, test_data
+
+	folderpath: path where the data is stored with the following structure
+	/binarylabels.txt
+	/images
+	  /anger_000000.png
+	  /anger_000001.png
+	  /...
+	target_img_size: image size needed for the model, eg (100, 100, 3) [default]
+
+	Function returns 2 image data generators (train, test) with dataflow from directory
+	"""
+	labelling_list = open(folderpath + 'binarylabels.txt', 'r').read().strip().split('\n')
+
+	train_set = {'filename':[], 'class':[]}
+
+	for line in labelling_list:
+	    filename, ishappy = line.split(' ')
+	    train_set['filename'].append(filename)
+	    if int(ishappy):
+	        train_set['class'].append('happy')
+	    else:
+	        train_set['class'].append('nothappy')
+
+	print("Counted %s images in total" % len(train_set['filename']))
+
+	train_set = pd.DataFrame(data=train_set)
+
+	train_data_gen = ImageDataGenerator(rotation_range=10, width_shift_range=0.1, 
+	                                    height_shift_range=0.1, shear_range=0.1, zoom_range=0.1,
+	                                    horizontal_flip=True, validation_split=0.2)
+	train_data = train_data_gen.flow_from_dataframe(train_set, directory = folderpath + 'images/', batch_size=32, 
+	                                                color_mode='rgb', shuffle=True, class_mode='binary',
+	                                                target_size=target_img_size[:2], subset='training')
+
+	test_data_gen = ImageDataGenerator(validation_split=0.2)
+	test_data = test_data_gen.flow_from_dataframe(train_set, directory = folderpath + 'images/', batch_size=32, 
+	                                              color_mode='rgb', shuffle=True, class_mode='binary',
+	                                              target_size=target_img_size[:2], subset='validation')
+
+	return train_data, test_data
+
 
 """ Load FERplus Dataset """
 def load_RAF(folderpath, target_img_size=(100, 100, 3)):
