@@ -2,6 +2,47 @@ import pandas as pd
 import numpy as np
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
+""" Load Self-Supervised Dataset """
+def load_selfsupervised(folderpath, foldername, target_img_size=(100, 100, 3), preprocessing_function=None, batch_size=32):
+	"""
+	@params		folderpath, foldername, target_img_size, preprocessing_function, batch_size
+	@returns	train_data, test_data
+
+	folderpath: path to data directory
+	foldername: name of the folder containing the images
+	/folderpath
+	  /foldername
+	  	/img_000000.png
+	  	/img_000001.png
+	  	/...
+	target_img_size: image size needed for the model, eg (100, 100, 3) [default]
+	preprocessing_function: function to preprocess the data
+	batch_size: define batch size
+
+	Function returns 2 image data generators (train, test) with dataflow from directory
+	"""
+	# training data
+	train_data_gen = ImageDataGenerator(preprocessing_function=preprocessing_function,
+	                                    validation_split=0.2)
+	train_data = train_data_gen.flow_from_directory(folderpath, classes=[foldername],
+	                                                target_size=target_img_size[:2],
+	                                                color_mode='rgb', shuffle=True,
+	                                                class_mode='input', batch_size=batch_size,
+	                                                subset='training')
+
+	# test data
+	test_data_gen = ImageDataGenerator(preprocessing_function=preprocessing_function,
+	                                   validation_split=0.2)
+	train_data = test_data_gen.flow_from_directory(folderpath, classes=[foldername],
+	                                                target_size=target_img_size[:2],
+	                                                color_mode='rgb', shuffle=True,
+	                                                class_mode='input', batch_size=batch_size,
+	                                                subset='validation')
+
+	return train_data, test_data 
+
+
+
 """ Load binary Dataset """
 def load_binary(folderpath, target_img_size=(100, 100, 3)):
 	"""
