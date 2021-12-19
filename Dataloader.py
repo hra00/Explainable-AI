@@ -33,7 +33,7 @@ def load_selfsupervised(folderpath, foldername, target_img_size=(100, 100, 3), p
 	# test data
 	test_data_gen = ImageDataGenerator(preprocessing_function=preprocessing_function,
 	                                   validation_split=0.2)
-	train_data = test_data_gen.flow_from_directory(folderpath, classes=[foldername],
+	test_data = test_data_gen.flow_from_directory(folderpath, classes=[foldername],
 	                                                target_size=target_img_size[:2],
 	                                                color_mode='rgb', shuffle=True,
 	                                                class_mode='input', batch_size=batch_size,
