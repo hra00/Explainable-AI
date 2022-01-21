@@ -1,6 +1,153 @@
 import pandas as pd
 import numpy as np
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+import cv2
+import tensorflow as tf
+
+# https://www.pyimagesearch.com/2021/06/14/a-gentle-introduction-to-tf-data-with-tensorflow/
+
+""" Load Fer+ Dataset with target vector """
+def label_transform(y):
+    return y / np.sum(y)
+
+def load_FERplus_targetvector(folderpath, target_img_size=(100, 100), preprocessing_function=None, batch_size=32):
+	"""
+	@params		folderpath, batch_size, target_img_size, preprocessing_function
+	@returns	(X_train, Y_train), (X_val, Y_val), (X_test, Y_test)
+
+	folderpath: path where the data is stored with the following structure
+	/images
+	  /fer2013new.csv
+	  /FER2013Test
+		/fer0032220.png
+		/...
+	  /FER2013Train
+		/fer0000000.png
+		/...
+	  /FER2013Valid
+		/fer0028638.png
+		/...
+	target_img_size:	 	image size needed for the model, eg (100, 100) [default]
+	batch_size:		 		batch size for the dataset
+	preprocessing_function:	preprocessing for the image
+
+	Function returns (X_train, Y_train), (X_val, Y_val), (X_test, Y_test) tensors
+	"""
+
+	# get file and folder paths
+	path_fer2013new = folderpath + 'fer2013new.csv'
+	train_dir = folderpath + 'images/FER2013Train/'
+	test_dir = folderpath + 'images/FER2013Test/'
+	val_dir = folderpath + 'images/FER2013Valid/'
+
+	# read labelling list
+	labelling_list = pd.read_csv(path_fer2013new)
+
+	# array for the data
+	X_train = []; Y_train = []
+	X_val = []; Y_val = []
+	X_test = []; Y_test = []
+
+	# iterate through files and load them
+	for idx, elem in labelling_list.iterrows():
+	    image_name = elem['Image name']
+	    
+	    if not isinstance(image_name, str): continue
+	        
+	    # get the vote vector for the emotions
+	    vote_vector = np.array(elem[2:-3].to_numpy(), dtype='float32')
+	    
+	    # skip if sum of vote vector is smaller than 1 (less than one vote for image)
+	    if np.sum(vote_vector) < 1: continue
+	    
+	    # transform to probability distribution with label_transform
+	    prob_dist_vote_vector = vote_vector / np.sum(vote_vector)
+	    
+	    if elem.Usage == 'Training':
+	        # load image
+	        img = cv2.imread(train_dir + image_name)
+	        if img is None: continue
+
+	        # change color channel order (RGB instead of BGR)
+	        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+	        # resize image
+	        if img.shape[:2] != target_img_size:
+        		img = cv2.resize(img, dsize=target_img_size, interpolation=cv2.INTER_CUBIC)
+
+	        # fill arrays
+	        X_train.append(img)
+	        Y_train.append(prob_dist_vote_vector)
+	        
+	    elif elem.Usage == 'PrivateTest':
+	        # load image
+	        img = cv2.imread(test_dir + image_name)
+	        if img is None: continue
+
+	        # change color channel order (RGB instead of BGR)
+	        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+	        # resize image
+	        if img.shape[:2] != target_img_size:
+	        	img = cv2.resize(img, dsize=target_img_size, interpolation=cv2.INTER_CUBIC)
+
+	        # fill arrays
+	        X_val.append(img)
+	        Y_val.append(prob_dist_vote_vector)
+	        
+	    elif elem.Usage == 'PublicTest':
+	        # load image
+	        img = cv2.imread(val_dir + image_name)
+	        if img is None: continue
+
+	        # change color channel order (RGB instead of BGR)
+	        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+	        # resize image
+	        if img.shape[:2] != target_img_size:
+	        	img = cv2.resize(img, dsize=target_img_size, interpolation=cv2.INTER_CUBIC)
+
+	        # preprocess image
+	        #if preprocessing_function is not None:
+	        #    img = preprocessing_function(img)
+
+	        # fill arrays
+	        X_test.append(img)
+	        Y_test.append(prob_dist_vote_vector)
+	        
+	X_train = np.array(X_train); Y_train = np.array(Y_train)
+	X_val = np.array(X_val); Y_val = np.array(Y_val)
+	X_test = np.array(X_test); Y_test = np.array(Y_test)
+
+	print("Training\n-", X_train.shape, "\n-", Y_train.shape)
+	print("Validation\n-", X_val.shape, "\n-", Y_val.shape)
+	print("Testing\n-", X_test.shape, "\n-", Y_test.shape)
+
+	train_data_gen = ImageDataGenerator(rotation_range=10, width_shift_range=0.1, 
+	                                    height_shift_range=0.1, shear_range=0.1, zoom_range=0.1,
+	                                    horizontal_flip=True,
+	                                    preprocessing_function=preprocessing_function)
+	train_data = train_data_gen.flow(
+		x=X_train, y=Y_train,
+		batch_size=batch_size,
+		shuffle=True)
+
+	val_data_gen = ImageDataGenerator(preprocessing_function=preprocessing_function)
+	val_data = val_data_gen.flow(
+		x=X_val, y=Y_val,
+		batch_size=batch_size,
+		shuffle=True)
+
+	test_data_gen = ImageDataGenerator(preprocessing_function=preprocessing_function)
+	test_data = test_data_gen.flow(
+		x=X_test, y=Y_test,
+		batch_size=batch_size,
+		shuffle=True)
+
+	return train_data, val_data, test_data
+	#return (X_train, Y_train), (X_val, Y_val), (X_test, Y_test)
+
+
 
 """ Load Self-Supervised Dataset """
 def load_selfsupervised(folderpath, foldername, target_img_size=(100, 100, 3), preprocessing_function=None, batch_size=32):
@@ -90,7 +237,7 @@ def load_binary(folderpath, target_img_size=(100, 100, 3)):
 	return train_data, test_data
 
 
-""" Load FERplus Dataset """
+""" Load RAF Dataset """
 def load_RAF(folderpath, target_img_size=(100, 100, 3)):
 	"""
 	@params		folderpath, target_img_size
