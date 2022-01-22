@@ -3,13 +3,111 @@ import numpy as np
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import cv2
 import tensorflow as tf
+from sklearn.model_selection import train_test_split
 
 # https://www.pyimagesearch.com/2021/06/14/a-gentle-introduction-to-tf-data-with-tensorflow/
+
+
+""" Load RAF-DB Dataset with target vector """
+def load_RAF_targetvector(folderpath, target_img_size=(100, 100), preprocessing_function=None, batch_size=32):
+	"""
+	@params		folderpath, target_img_size
+	@returns	train_data, test_data
+
+	folderpath: path where the data is stored with the following structure
+	/distribution_basic.txt
+	/images
+	  /test_0001_aligned.jpg
+	  /test_0002_aligned.jpg
+	  /test_0003_aligned.jpg
+	  /...
+	target_img_size:	 	image size needed for the model, eg (100, 100) [default]
+	batch_size:		 		batch size for the dataset
+	preprocessing_function:	preprocessing for the image
+
+	Function returns train_data, val_data, test_data ImageDataGenerators
+	"""
+	# get file and folder paths
+	labelling_list = open(folderpath + 'distribution_basic.txt', 'r').read().strip().split(' \n')
+	img_dir = folderpath + 'images/'
+
+	X_train = []; Y_train = []
+	X_test = []; Y_test = []
+	Y_test_oneclass = [];
+	
+	for name_vector_string in labelling_list:
+		# separate line of labelling list into image name and target vector
+		splitted_name_vector_string = name_vector_string.split(' ')
+		image_name = splitted_name_vector_string[0]
+		# typecast target vector from string to float
+		target_vector = np.asarray(splitted_name_vector_string[1:], dtype="float32")
+		
+		# get class label to stratify training / validation split
+		max_label = np.argmax(target_vector)
+
+		# add aligned to image
+		name, fileend = image_name.split('.')
+		filename = name + '_aligned.' + fileend
+
+		# load image
+		img = cv2.imread(img_dir + filename)
+		if img is None:
+			print("Error finding image", filename)
+			continue
+		# change color channel order (RGB instead of BGR)
+		img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+		# resize image
+		if img.shape[:2] != target_img_size:
+			img = cv2.resize(img, dsize=target_img_size, interpolation=cv2.INTER_CUBIC)
+
+		if filename.startswith('train'):
+			X_train.append(img)
+			Y_train.append(target_vector)
+		else:
+			X_test.append(img)
+			Y_test.append(target_vector)
+			Y_test_oneclass.append(max_label)
+
+	X_train = np.array(X_train); Y_train = np.array(Y_train)
+	X_test = np.array(X_test); Y_test = np.array(Y_test)
+
+	print("Splitting testing dataset into stratified validation and training set")
+	X_test, X_val, Y_test, Y_val = train_test_split(X_test, Y_test, test_size=0.5, stratify=Y_test_oneclass)
+
+
+	print("Training\n-", X_train.shape, "\n-", Y_train.shape)
+	print("Validation\n-", X_val.shape, "\n-", Y_val.shape)
+	print("Testing\n-", X_test.shape, "\n-", Y_test.shape)
+
+	train_data_gen = ImageDataGenerator(rotation_range=10, width_shift_range=0.1, 
+	                                    height_shift_range=0.1, shear_range=0.1, zoom_range=0.1,
+	                                    horizontal_flip=True,
+	                                    preprocessing_function=preprocessing_function)
+	train_data = train_data_gen.flow(
+		x=X_train, y=Y_train,
+		batch_size=batch_size,
+		shuffle=True)
+
+	val_data_gen = ImageDataGenerator(preprocessing_function=preprocessing_function)
+	val_data = val_data_gen.flow(
+		x=X_val, y=Y_val,
+		batch_size=batch_size,
+		shuffle=True)
+
+	test_data_gen = ImageDataGenerator(preprocessing_function=preprocessing_function)
+	test_data = test_data_gen.flow(
+		x=X_test, y=Y_test,
+		batch_size=batch_size,
+		shuffle=True)
+
+	return train_data, val_data, test_data
+
 
 """ Load Fer+ Dataset with target vector """
 def label_transform(y):
     return y / np.sum(y)
-
+    
 def load_FERplus_targetvector(folderpath, target_img_size=(100, 100), preprocessing_function=None, batch_size=32):
 	"""
 	@params		folderpath, batch_size, target_img_size, preprocessing_function
@@ -31,7 +129,7 @@ def load_FERplus_targetvector(folderpath, target_img_size=(100, 100), preprocess
 	batch_size:		 		batch size for the dataset
 	preprocessing_function:	preprocessing for the image
 
-	Function returns (X_train, Y_train), (X_val, Y_val), (X_test, Y_test) tensors
+	Function returns train_data, val_data, test_data ImageDataGenerators
 	"""
 
 	# get file and folder paths
@@ -145,8 +243,6 @@ def load_FERplus_targetvector(folderpath, target_img_size=(100, 100), preprocess
 		shuffle=True)
 
 	return train_data, val_data, test_data
-	#return (X_train, Y_train), (X_val, Y_val), (X_test, Y_test)
-
 
 
 """ Load Self-Supervised Dataset """
@@ -187,7 +283,6 @@ def load_selfsupervised(folderpath, foldername, target_img_size=(100, 100, 3), p
 	                                                subset='validation')
 
 	return train_data, test_data 
-
 
 
 """ Load binary Dataset """
@@ -400,3 +495,8 @@ def load_FERplus(folderpath, target_img_size=(100, 100, 3)):
 	                                              target_img_size=target_img_size[:2])
 
 	return train_data, val_data, test_data
+
+
+if __name__ == "__main__":
+	RAF_DIR = './data/RAF/'
+	load_RAF_targetvector(RAF_DIR)
