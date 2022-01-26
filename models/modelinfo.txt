@@ -1,2 +1,65 @@
 RAF-impr-std_0124-1008: val=83.63754749298096; test=82.07300901412964
+
+
+from ModelGenerator import get_base_model2
+
+# image shape
+IMG_SHAPE = (100, 100, 3)
+
+# model
+model_name = 'RAF-impr-std_0124-1008_weights.h5'
+model = get_base_model2(IMG_SHAPE)
+model.add(tf.keras.layers.Dense(7, activation='softmax', name="softmax"))
+model.load_weights('./models/' + model_name)
+
+# last convolutional name
+LAST_CONV_NAME = 'block3_conv3'
+
+# preprocessing function for model
+def preprocess(x):
+    mean = [146.6770, 114.6274, 102.3102]
+    std = [67.6282, 61.7651, 61.3665]
+    # ensure image format
+    x = np.array(x, dtype='float32')
+    # normalize
+    x[..., 0] -= mean[0]
+    x[..., 1] -= mean[1]
+    x[..., 2] -= mean[2]
+    if std is not None:
+        x[..., 0] /= std[0]
+        x[..., 1] /= std[1]
+        x[..., 2] /= std[2] 
+    return x
+    
+--------------------------------------------------------
 FERplus-impr-std_0124-1040: val=84.38287377357483; test=83.76641273498535
+
+from ModelGenerator import get_base_model2
+
+# image shape
+IMG_SHAPE = (100, 100, 3)
+
+# model
+model_name = 'FERplus-impr-std_0124-1040_weights.h5'
+model = get_base_model2(IMG_SHAPE)
+model.add(tf.keras.layers.Dense(7, activation='softmax', name="softmax"))
+model.load_weights('./models/' + model_name)
+
+# last convolutional name
+LAST_CONV_NAME = 'block3_conv3'
+
+# preprocessing function for model
+def preprocess(x):
+    mean = [129.4432, 129.4432, 129.4432]
+    std = [64.87448751, 64.87448751, 64.87448751]
+    # ensure image format
+    x = np.array(x, dtype='float32')
+    # normalize
+    x[..., 0] -= mean[0]
+    x[..., 1] -= mean[1]
+    x[..., 2] -= mean[2]
+    if std is not None:
+        x[..., 0] /= std[0]
+        x[..., 1] /= std[1]
+        x[..., 2] /= std[2] 
+    return x
