@@ -29,7 +29,10 @@ def preprocess(x):
         x[..., 1] /= std[1]
         x[..., 2] /= std[2] 
     return x
-    
+   
+emotion_labels = ['surprise', 'fear', 'disgust', 'happiness', 'sadness', 'anger', 'neutral']
+
+
 --------------------------------------------------------
 FERplus-impr-std_0124-1040: val=84.38287377357483; test=83.76641273498535
 
@@ -62,3 +65,5 @@ def preprocess(x):
         x[..., 1] /= std[1]
         x[..., 2] /= std[2] 
     return x
+
+emotion_labels = ['neutral', 'happiness', 'surprise', 'sadness', 'anger', 'disgust', 'fear']
