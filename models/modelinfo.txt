@@ -1,6 +1,5 @@
 RAF-impr-std_0124-1008: val=83.63754749298096; test=82.07300901412964
 
-
 from ModelGenerator import get_base_model2
 
 # image shape
