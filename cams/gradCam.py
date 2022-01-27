@@ -3,7 +3,7 @@ import tensorflow as tf
 from utils.image import scale_cam
 
 def get_gradcam(vis, input_tensor):
-    pred = np.argmax(vis.model.predict(input_tensor)[0])
+    model_out = vis.model.predict(input_tensor)[0]
     with tf.GradientTape() as tape:
         inputs = input_tensor
         last_conv_layer_output = vis.activation_model(inputs)
@@ -22,15 +22,15 @@ def get_gradcam(vis, input_tensor):
         last_conv_layer_output[:, :, i] *= pooled_grads[i]
 
     gradcam = np.mean(last_conv_layer_output, axis=-1)
-    return scale_cam(gradcam, vis.img_shape), pred
+    return scale_cam(gradcam, vis.img_shape), model_out
 
 def get_GradCAM(vis, img_tensors: np.ndarray) -> [[np.ndarray], [int]]:
     heatmaps = []
     preds = []
     for img in img_tensors:
         img = img[np.newaxis, ...]
-        heatmap, pred = get_gradcam(vis, img)
+        heatmap, model_out = get_gradcam(vis, img)
         heatmaps.append(heatmap)
-        preds.append(pred)
-    return heatmaps, preds
+        preds.append(model_out)
+    return heatmaps, [(np.argmax(pred), '%0.2f' % (max(pred) * 100)) for pred in preds]
 

@@ -15,6 +15,6 @@ def get_eigencam(activation):
 def get_EigenCAM(vis, img_tensors: np.ndarray) -> [[np.ndarray], [int]]:
     activations = vis.activation_model.predict(img_tensors)
     cams = [get_eigencam(activation[np.newaxis, ...]) for activation in activations]
-    predicts = [np.argmax(pred) for pred in vis.model.predict(img_tensors)]
+    model_out = vis.model.predict(img_tensors)
     heatmaps = [scale_cam(cam, vis.img_shape) for cam in cams]
-    return heatmaps, predicts
+    return heatmaps, [(np.argmax(pred), '%0.2f'% (max(pred) * 100)) for pred in model_out]

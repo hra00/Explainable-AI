@@ -89,7 +89,7 @@ def scale_cam(cam, img_shape):
     cam = cv2.resize(cam, img_shape[:2])
     return np.float32(cam)
 
-# TODO : labels, blended heatmap
+
 def pp_images(img_tensors, heatmaps=None, preds=None, labels=None, RGB = None, alpha = 0.5):
     img_tensors = [img_tensor for img_tensor in img_tensors]
     num_imgs = len(img_tensors)
@@ -98,19 +98,14 @@ def pp_images(img_tensors, heatmaps=None, preds=None, labels=None, RGB = None, a
     _, axs = plt.subplots(H, W, figsize=(60,W*3))
     for i in range(num_imgs):
         img_tensors[i] = img_tensors[i]/255 if RGB else img_tensors[i]
-        if H == 1:
-            axs[i % W].imshow(img_tensors[i])
-            if heatmaps:
-                # axs[i//W][i%W].set_title(labels[preds[i]])
-                axs[i % W].imshow(heatmaps[i], cmap='jet', alpha=alpha)
-        else:
-            axs[i//W][i%W].imshow(img_tensors[i])
-            if heatmaps:
-                #axs[i//W][i%W].set_title(labels[preds[i]])
-                axs[i//W][i%W].imshow(heatmaps[i], cmap='jet', alpha=alpha)
+        ax = axs[i % W] if H==1 else axs[i//W][i%W]
+        ax.imshow(img_tensors[i])
+        if labels:
+            ax.set_title('{label} ({percent}%)'.format(label=labels[preds[i][0]], percent=preds[i][1]), fontsize=37)
+        if heatmaps:
+            ax.imshow(heatmaps[i], cmap='jet', alpha=alpha)
     tight_layout()
     plt.show()
-
 
 def pp_blended_heatmaps(heatmaps:[[np.array]]):
     blended = [scale_cam(sum(heatmap), heatmaps[0][0].shape) for heatmap in heatmaps]
