@@ -106,5 +106,10 @@ def pp_images(img_tensors, heatmaps=None, preds=None, labels=None, RGB = None, a
             axs[i//W][i%W].imshow(img_tensors[i])
             if heatmaps:
                 #axs[i//W][i%W].set_title(labels[preds[i]])
-                axs[i % W].imshow(heatmaps[i], cmap='jet', alpha=alpha)
+                axs[i//W][i%W].imshow(heatmaps[i], cmap='jet', alpha=alpha)
     plt.show()
+
+
+def pp_blended_heatmaps(heatmaps:[[np.array]]):
+    blended = [scale_cam(sum(heatmap), heatmaps[0][0].shape) for heatmap in heatmaps]
+    pp_images(blended)
