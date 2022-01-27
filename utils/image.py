@@ -3,6 +3,7 @@ import random
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.pyplot import tight_layout
 
 labels_raf = {  0:  'Anger',
                 1:  'Disgust',
@@ -94,7 +95,7 @@ def pp_images(img_tensors, heatmaps=None, preds=None, labels=None, RGB = None, a
     num_imgs = len(img_tensors)
     W = min(num_imgs, 10)
     H = math.ceil(num_imgs / W)
-    _, axs = plt.subplots(H, W, figsize=(20, 20))
+    _, axs = plt.subplots(H, W, figsize=(60,W*3))
     for i in range(num_imgs):
         img_tensors[i] = img_tensors[i]/255 if RGB else img_tensors[i]
         if H == 1:
@@ -107,6 +108,7 @@ def pp_images(img_tensors, heatmaps=None, preds=None, labels=None, RGB = None, a
             if heatmaps:
                 #axs[i//W][i%W].set_title(labels[preds[i]])
                 axs[i//W][i%W].imshow(heatmaps[i], cmap='jet', alpha=alpha)
+    tight_layout()
     plt.show()
 
 

@@ -1,6 +1,9 @@
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 from utils.ModelGenerator import get_base_model2
+from cams.vCam import get_CAM
+from cams.eigenCam import get_EigenCAM
+from cams.gradCam import get_GradCAM
 
 class Visualizer:
     def __init__(self,
@@ -47,5 +50,14 @@ class Visualizer:
         return classifier_model
 
     def getCAM(self, input_tensor):
-        pass
+        return get_CAM(self, input_tensor)
+
+    def getEigenCAM(self, input_tensor):
+        return get_EigenCAM(self, input_tensor)
+
+    def getGradCAM(self, input_tensor):
+        return get_GradCAM(self, input_tensor)
+
+
+
 
