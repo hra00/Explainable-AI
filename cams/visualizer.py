@@ -4,13 +4,13 @@ from utils.ModelGenerator import get_base_model2
 from cams.vCam import get_CAM
 from cams.eigenCam import get_EigenCAM
 from cams.gradCam import get_GradCAM
+from utils.preprocess import *
 
 class Visualizer:
     def __init__(self,
                  model_name,
                  last_conv_name,
-                 img_shape,
-                 preprocess=None):
+                 img_shape):
         self.model_name = model_name
         self.img_shape = img_shape
         self.model = self.loadModel()
@@ -18,11 +18,15 @@ class Visualizer:
         self.last_conv_layer = self.model.get_layer(self.last_conv_name)
         self.cam_model = self.getCamModel()
         self.activation_model = self.getActivationModel()
-        self.preprocess = preprocess
+        self.preprocess = self.get_preprocess_fn()
         self.classifier_model = self.getClassifierModel()
 
     def loadModel(self):
         if self.model_name == 'FERplus-impr-std_0124-1040_weights.h5':
+            model = get_base_model2(self.img_shape)
+            model.add(tf.keras.layers.Dense(7, activation='softmax', name="softmax"))
+            model.load_weights('./models/' + self.model_name)
+        elif self.model_name == 'RAF-impr-std_0124-1008_weights.h5':
             model = get_base_model2(self.img_shape)
             model.add(tf.keras.layers.Dense(7, activation='softmax', name="softmax"))
             model.load_weights('./models/' + self.model_name)
@@ -48,6 +52,12 @@ class Visualizer:
             x = self.model.get_layer(layer_name)(x)
         classifier_model = tf.keras.Model(classifier_input, x)
         return classifier_model
+
+    def get_preprocess_fn(self):
+        if self.model_name == 'FERplus-impr-std_0124-1040_weights.h5':
+            return preprocess_FERplus_impr
+        elif self.model_name == 'RAF-impr-std_0124-1008_weights.h5':
+            return preprocess_RAF_impr
 
     def getCAM(self, input_tensor):
         return get_CAM(self, input_tensor)
