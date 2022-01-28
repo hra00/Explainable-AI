@@ -97,4 +97,4 @@ model = load_model(model_name)
 # last convolutional name
 LAST_CONV_NAME = 'conv2d_7'
 
-emotion_labels = ['NF', 'anger', 'comtempt', 'disgust', 'fear', 'happiness', 'neutral', 'sadness', surprise, unknown]
+emotion_labels = ['NF', 'anger', 'comtempt', 'disgust', 'fear', 'happiness', 'neutral', 'sadness', 'surprise', 'unknown]
