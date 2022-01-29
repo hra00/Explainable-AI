@@ -12,7 +12,9 @@ def get_eigencam(activation):
     return np.float32(cam)
 
 
-def get_EigenCAM(vis, img_tensors: np.ndarray) -> [[np.ndarray], [int]]:
+def get_EigenCAM(vis, img_tensors: np.ndarray, preprocess) -> [[np.ndarray], [int]]:
+    if preprocess:
+        img_tensors = np.array([vis.preprocess(img) for img in img_tensors])
     activations = vis.activation_model.predict(img_tensors)
     cams = [get_eigencam(activation[np.newaxis, ...]) for activation in activations]
     model_out = vis.model.predict(img_tensors)
