@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.pyplot import tight_layout
+from retinaface import RetinaFace as rf
 
 labels_raf = {  0:  'Anger',
                 1:  'Disgust',
@@ -89,13 +90,19 @@ def scale_cam(cam, img_shape):
     cam = cv2.resize(cam, img_shape[:2])
     return np.float32(cam)
 
+def aligned_tensor(img_paths, img_size=(100,100,3)):
+    img_tensors = [cv2.resize(rf.extract_faces(img_path=img, align=True)[0], img_size[:2]) for img in img_paths]
+    img_tensors_rgb = np.array([img / 255 for img in img_tensors])
+    img_tensors_not_rgb = np.array(img_tensors)
+    return img_tensors, img_tensors_rgb, img_tensors_not_rgb
 
-def pp_images(img_tensors, heatmaps=None, preds=None, labels=None, RGB = None, alpha = 0.5):
+
+def pp_images(img_tensors, heatmaps=None, preds=None, labels=None, RGB = None, alpha = 0.5, figsize=(50,10)):
     img_tensors = [img_tensor for img_tensor in img_tensors]
     num_imgs = len(img_tensors)
     W = min(num_imgs, 10)
     H = math.ceil(num_imgs / W)
-    _, axs = plt.subplots(H, W, figsize=(60,W*3))
+    _, axs = plt.subplots(H, W, figsize=figsize)
     for i in range(num_imgs):
         img_tensors[i] = img_tensors[i]/255 if RGB else img_tensors[i]
         ax = axs[i % W] if H==1 else axs[i//W][i%W]
@@ -107,6 +114,6 @@ def pp_images(img_tensors, heatmaps=None, preds=None, labels=None, RGB = None, a
     tight_layout()
     plt.show()
 
-def pp_blended_heatmaps(heatmaps:[[np.array]]):
+def pp_blended_heatmaps(heatmaps:[[np.array]], figsize=None):
     blended = [scale_cam(sum(heatmap), heatmaps[0][0].shape) for heatmap in heatmaps]
-    pp_images(blended)
+    pp_images(blended, figsize=figsize)
