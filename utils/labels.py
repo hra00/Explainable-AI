@@ -4,6 +4,7 @@ emotion_labels_raf_h = ['Anger', 'Disgust', 'Fear', 'Happiness', 'Neutral', 'Sad
 emotion_labels_ferplus_h = ['NF', 'anger', 'comtempt', 'disgust', 'fear', 'happiness', 'neutral', 'sadness', 'surprise', 'unknown']
 
 def get_labels(model_name):
+    model_path = './models/'
     if model_name == 'FERplus-impr-std_0124-1040_weights.h5':
         return emotion_labels_FERplus_impr
     elif model_name == 'RAF-impr-std_0124-1008_weights.h5':
