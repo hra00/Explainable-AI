@@ -1,7 +1,7 @@
 import numpy as np
 from utils.image import scale_cam
 
-def get_CAM(vis, images):
+def get_CAM(vis, images, start_idx):
     image_batch = np.array([vis.preprocess(img) for img in images])
 
     # predict
@@ -12,7 +12,7 @@ def get_CAM(vis, images):
     # for each image repeat
     CAMs = []
     for idx in range(image_batch.shape[0]):
-        max_idx = np.argmax(np.squeeze(model_out[idx]))
+        max_idx = np.argmax(np.squeeze(model_out[idx])) if not start_idx else start_idx
         # print(f"Maximum index {max_idx} with confidence {model_out[idx][max_idx] * 100:.2f}%")
 
         winning_weights = weights[:, max_idx]

@@ -59,14 +59,14 @@ class Visualizer:
         elif self.model_name == 'RAF-impr-std_0124-1008_weights.h5':
             return preprocess_RAF_impr
 
-    def getCAM(self, input_tensor):
-        return get_CAM(self, input_tensor)
+    def getCAM(self, input_tensor, start_idx=None):
+        return get_CAM(self, input_tensor, start_idx)
 
-    def getEigenCAM(self, input_tensor):
-        return get_EigenCAM(self, input_tensor)
+    def getEigenCAM(self, input_tensor, preprocess=False):
+        return get_EigenCAM(self, input_tensor, preprocess)
 
-    def getGradCAM(self, input_tensor):
-        return get_GradCAM(self, input_tensor)
+    def getGradCAM(self, input_tensor, preprocess=False, start_idx=None):
+        return get_GradCAM(self, input_tensor, preprocess, start_idx)
 
 
 
