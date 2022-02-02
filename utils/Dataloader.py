@@ -408,10 +408,11 @@ def load_biased_RAF_targetvector(folderpath, image_dir_name = 'images/', target_
     image_dir_name: name of directory of the biased data (e.g. 'male/')
     /distribution_basic.txt
     /images
-      /test_0001.jpg
-      /test_0002.jpg
-      /test_0003.jpg
-      /...
+      /male
+        /test_0001.jpg
+        /test_0003.jpg
+        /test_0014.jpg
+        /...
     target_img_size:	 	image size needed for the model, eg (100, 100) [default]
     batch_size:		 		batch size for the dataset
     preprocessing_function:	preprocessing for the image
@@ -420,7 +421,7 @@ def load_biased_RAF_targetvector(folderpath, image_dir_name = 'images/', target_
     """
     # get file and folder paths
     labelling_list = open(folderpath + 'distribution_basic.txt', 'r').read().strip().split(' \n')
-    img_dir = folderpath + 'images/'
+    img_dir = folderpath + 'images/' + image_dir_name
 
     X_train = []; Y_train = []
     X_test = []; Y_test = []
@@ -439,7 +440,7 @@ def load_biased_RAF_targetvector(folderpath, image_dir_name = 'images/', target_
         # add aligned to image
         name, fileend = image_name.split('.')
         filename = name + '.' + fileend
-        
+
         # load image
         img = cv2.imread(img_dir + filename)
         if img is None:
