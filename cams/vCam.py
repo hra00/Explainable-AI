@@ -1,8 +1,8 @@
 import numpy as np
 from utils.image import scale_cam
 
-def get_CAM(vis, images, start_idx):
-    image_batch = np.array([vis.preprocess(img) for img in images])
+def get_CAM(vis, img_tensors: np.ndarray, preprocess, start_idx):
+    image_batch = np.array([vis.preprocess(img) for img in img_tensors]) if preprocess else img_tensors
 
     # predict
     model_out, feature_maps = vis.cam_model.predict(image_batch)
@@ -25,4 +25,8 @@ def get_CAM(vis, images, start_idx):
         #heatmap = cv2.resize(CAM, self.img_shape[:2])
         heatmaps.append(scale_cam(CAM, self.img_shape))
     """
-    return heatmaps, [(pred.index(max(pred)), '%0.2f' % (max(pred) * 100)) for pred in model_out.tolist()]
+    if start_idx:
+        preds = [(start_idx, '%0.2f' % (pred[start_idx] * 100)) for pred in model_out.tolist()]
+    else:
+        preds = [(pred.index(max(pred)), '%0.2f' % (max(pred) * 100)) for pred in model_out.tolist()]
+    return heatmaps, preds
