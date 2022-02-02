@@ -121,3 +121,13 @@ def pp_images(img_tensors, heatmaps=None, preds=None, labels=None, RGB = None, a
 def pp_blended_heatmaps(heatmaps:[[np.array]], figsize=None):
     blended = [scale_cam(sum(heatmap), heatmaps[0][0].shape) for heatmap in heatmaps]
     pp_images(blended, figsize=figsize)
+
+
+def save_results(save_path, imgs, heatmaps, titles):
+    for img, title in zip(imgs, titles[:6]):
+        plt.imshow(img)
+        plt.savefig(save_path + title + '.png', dpi=300, bbox_inches='tight')
+    for img, heatmap, title in zip(imgs * 5, heatmaps, titles[6:]):
+        plt.imshow(img)
+        plt.imshow(heatmap, cmap='jet', alpha=0.5)
+        plt.savefig(save_path + title + '.png', dpi=300, bbox_inches='tight')
