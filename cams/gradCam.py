@@ -34,5 +34,11 @@ def get_GradCAM(vis, img_tensors: np.ndarray, preprocess, start_idx) -> [[np.nda
         heatmap, model_out = get_gradcam(vis, img, start_idx)
         heatmaps.append(heatmap)
         preds.append(model_out)
-    return heatmaps, [(np.argmax(pred), '%0.2f' % (max(pred) * 100)) for pred in preds]
+
+    if start_idx:
+        ret_preds = [(start_idx, '%0.2f' % (pred[start_idx] * 100)) for pred in preds]
+    else:
+        ret_preds = [(np.argmax(pred), '%0.2f' % (max(pred) * 100)) for pred in preds]
+
+    return heatmaps, ret_preds
 
