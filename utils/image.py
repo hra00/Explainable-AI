@@ -45,14 +45,16 @@ raw_labels_fer = {  1: 'neutral',
                     10: 'NF'
                  }
 
-def img_to_tensor(img_path, img_size=(100,100,3), RGB=True):
+def img_to_tensor(img_path, img_size=(100,100,3)):
     img = cv2.imread(img_path, 1)[...,::-1]
     img_tensor = cv2.resize(img, img_size[:2])
-    img_tensor = np.float32(img_tensor) / 255 if RGB else img_tensor
     return np.float32(img_tensor)
 
-def img_to_input_tensor(img_paths, img_size=(100,100,3), RGB=True):
-    return np.array([img_to_tensor(img_path, img_size, RGB).astype(np.float32) for img_path in img_paths])
+def img_to_input_tensor(img_paths, img_size=(100,100,3)):
+    img_tensors = [img_to_tensor(img_path, img_size).astype(np.float32) for img_path in img_paths]
+    img_tensors_rgb = np.array([img / 255 for img in img_tensors])
+    img_tensors_not_rgb = np.array(img_tensors)
+    return np.array(img_tensors)/255, img_tensors_rgb, img_tensors_not_rgb
 
 def get_img_list_raf(emotion : str, num_imgs=None):
     img_list = []
@@ -97,18 +99,20 @@ def aligned_tensor(img_paths, img_size=(100,100,3)):
     return img_tensors, img_tensors_rgb, img_tensors_not_rgb
 
 
-def pp_images(img_tensors, heatmaps=None, preds=None, labels=None, RGB = None, alpha = 0.5, figsize=(50,10)):
+def pp_images(img_tensors, heatmaps=None, preds=None, labels=None, RGB = None, alpha = 0.5, figsize=(50,10), wd=10, fontsize=37):
     img_tensors = [img_tensor for img_tensor in img_tensors]
     num_imgs = len(img_tensors)
-    W = min(num_imgs, 10)
+    W = min(num_imgs, wd)
     H = math.ceil(num_imgs / W)
     _, axs = plt.subplots(H, W, figsize=figsize)
     for i in range(num_imgs):
         img_tensors[i] = img_tensors[i]/255 if RGB else img_tensors[i]
         ax = axs[i % W] if H==1 else axs[i//W][i%W]
         ax.imshow(img_tensors[i])
-        if labels:
-            ax.set_title('{label} ({percent}%)'.format(label=labels[preds[i][0]], percent=preds[i][1]), fontsize=37)
+        if labels and preds:
+            ax.set_title('{label} ({percent}%)'.format(label=labels[preds[i][0]], percent=preds[i][1]), fontsize=fontsize)
+        elif labels and not preds:
+            ax.set_title(labels[i])
         if heatmaps:
             ax.imshow(heatmaps[i], cmap='jet', alpha=alpha)
     tight_layout()
