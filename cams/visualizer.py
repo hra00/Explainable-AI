@@ -30,6 +30,14 @@ class Visualizer:
             model = get_base_model2(self.img_shape)
             model.add(tf.keras.layers.Dense(7, activation='softmax', name="softmax"))
             model.load_weights('./models/' + self.model_name)
+        elif self.model_name == 'RAF-bias-male_0203-1144_weights.h5':
+            model = get_base_model2(self.img_shape)
+            model.add(tf.keras.layers.Dense(7, activation='softmax', name="softmax"))
+            model.load_weights('./models/' + self.model_name)
+        elif self.model_name == 'RAF-bias-female_0203-1408_weights.h5':
+            model = get_base_model2(self.img_shape)
+            model.add(tf.keras.layers.Dense(7, activation='softmax', name="softmax"))
+            model.load_weights('./models/' + self.model_name)
         else:
             model = load_model('./models/' + self.model_name)
         return model
@@ -54,9 +62,9 @@ class Visualizer:
         return classifier_model
 
     def get_preprocess_fn(self):
-        if self.model_name == 'FERplus-impr-std_0124-1040_weights.h5':
+        if self.model_name == 'FERplus-impr-std_0124-1040_weights.h5' :
             return preprocess_FERplus_impr
-        elif self.model_name == 'RAF-impr-std_0124-1008_weights.h5':
+        elif self.model_name in ['RAF-impr-std_0124-1008_weights.h5', 'RAF-bias-male_0203-1144_weights.h5', 'RAF-bias-female_0203-1408_weights.h5']:
             return preprocess_RAF_impr
 
     def getCAM(self, input_tensor, preprocess=False, start_idx=None):
@@ -67,7 +75,4 @@ class Visualizer:
 
     def getGradCAM(self, input_tensor, preprocess=False, start_idx=None):
         return get_GradCAM(self, input_tensor, preprocess, start_idx)
-
-
-
 
