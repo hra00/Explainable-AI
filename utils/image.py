@@ -99,7 +99,7 @@ def aligned_tensor(img_paths, img_size=(100,100,3)):
     return img_tensors, img_tensors_rgb, img_tensors_not_rgb
 
 
-def pp_images(img_tensors, heatmaps=None, preds=None, labels=None, RGB = None, alpha = 0.5, figsize=(50,10), wd=10, fontsize=37):
+def pp_images(img_tensors, heatmaps=None, preds=None, labels=None, RGB = None, alpha = 0.5, figsize=(50,10), wd=10, fontsize=37, axis=True):
     img_tensors = [img_tensor for img_tensor in img_tensors]
     num_imgs = len(img_tensors)
     W = min(num_imgs, wd)
@@ -115,6 +115,8 @@ def pp_images(img_tensors, heatmaps=None, preds=None, labels=None, RGB = None, a
             ax.set_title(labels[i])
         if heatmaps:
             ax.imshow(heatmaps[i], cmap='jet', alpha=alpha)
+        if not axis:
+            ax.axis('off')
     tight_layout()
     plt.show()
 

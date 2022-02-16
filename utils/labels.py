@@ -5,15 +5,7 @@ emotion_labels_ferplus_h = ['NF', 'anger', 'comtempt', 'disgust', 'fear', 'happi
 
 def get_labels(model_name):
     model_path = './models/'
-    if model_name == 'FERplus-impr-std_0124-1040_weights.h5':
+    if model_name == 'FERplus-impr-std_0124-1040_weights.h5' or 'FERplus-biased_0208-1922_weights.h5':
         return emotion_labels_FERplus_impr
-    elif model_name == 'RAF-impr-std_0124-1008_weights.h5':
+    else:
         return emotion_labels_RAF_impr
-    elif model_name == 'RAF-bias-female_0203-1408_weights.h5':
-        return emotion_labels_RAF_impr
-    elif model_name == 'RAF-bias-male_0203-1144_weights.h5':
-        return emotion_labels_RAF_impr
-    elif model_name == 'model_raf_h.h5':
-        return emotion_labels_raf_h
-    elif model_name == 'model_ferplus_h.h5':
-        return emotion_labels_raf_h

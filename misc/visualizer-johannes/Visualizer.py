@@ -115,7 +115,7 @@ if __name__ == "__main__":
 	# --------------------------
 
 
-	# visualize results
+	# visualize vis_results
 	if isinstance(images, list):
 	    plt.subplots(1, len(images), figsize=(14,6))
 	    for idx, image in enumerate(images):
