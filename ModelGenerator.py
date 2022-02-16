@@ -49,6 +49,8 @@ def get_extended_model(image_shape):
 	model.add(GlobalAveragePooling2D(name='GAP'))
 
 	return model
+
+	
 def get_base_model2(image_shape):
 	
 	model = tf.keras.Sequential()
